@@ -258,9 +258,18 @@ namespace ConsoleApp1
             // test6();
             //testInterlokedSimple();
             //OptInSerialization();
-            printAllAssemblies();
 
-            Thread.Sleep(10000);
+            //printAllAssemblies();
+
+            //Semaphore_max.test30();
+
+            //Array_weight.test1();
+            //Array_weight.test2();
+            //Array_weight.test3();
+            //Array_weight.test4();
+            Array_weight.test5();
+            Array_weight.test6();
+            Thread.Sleep(100000);
         }
 
 
