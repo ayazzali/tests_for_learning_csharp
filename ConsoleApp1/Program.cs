@@ -13,6 +13,42 @@ using System.Xml.Serialization;
 
 namespace ConsoleApp1
 {
+    class finClass
+    {
+        decimal[] arr = new decimal[1000_000];
+
+        public finClass() => Console.WriteLine("finClass ctor " + Thread.CurrentThread.ManagedThreadId);
+
+        ~finClass()
+        {
+            Console.WriteLine("finClass ~" + Thread.CurrentThread.ManagedThreadId);
+            //Thread.Sleep(60 * 1 );
+            throw new Exception("123");
+        }
+    }
+
+    [DebuggerDisplay("val = {val}")]
+    struct Number : IEquatable<int>
+    {
+        int val;
+
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+
+        public bool Equals(int other)
+        {
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+
+    }
     //[Serializable] 
     internal class qweClass : MarshalByRefObject
     {
@@ -267,8 +303,22 @@ namespace ConsoleApp1
             //Array_weight.test2();
             //Array_weight.test3();
             //Array_weight.test4();
-            Array_weight.test5();
-            Array_weight.test6();
+
+            //Array_weight.test5();
+            //Array_weight.test6();
+
+            var q1 = new Number();
+            _ = q1.Equals(1);
+
+            try
+            {
+                for (int i = 0; i < 1000_000; i++)
+                    new finClass();
+            }
+            catch
+            {
+                Console.WriteLine("catch");
+            }
             Thread.Sleep(100000);
         }
 
