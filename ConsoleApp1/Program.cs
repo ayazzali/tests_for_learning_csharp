@@ -10,20 +10,27 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization.Formatters.Soap;
 using System.Xml.Serialization;
+using System.Runtime.InteropServices;
 
 namespace ConsoleApp1
 {
     class finClass
     {
-        decimal[] arr = new decimal[1000_000];
+        long[] arr = new long[1000_000];
 
-        public finClass() => Console.WriteLine("finClass ctor " + Thread.CurrentThread.ManagedThreadId);
+        //public finClass() => Console.WriteLine("finClass ctor " + Thread.CurrentThread.ManagedThreadId);
+        public finClass()
+        {
+            Console.WriteLine("finClass ctor " + Thread.CurrentThread.ManagedThreadId);
+            for (int i = 0; i < arr.Length; i++)
+                arr[i] = i;
+        }
 
         ~finClass()
         {
             Console.WriteLine("finClass ~" + Thread.CurrentThread.ManagedThreadId);
-            //Thread.Sleep(60 * 1 );
-            throw new Exception("123");
+            //Thread.Sleep(60 * 1 * 60);
+            //throw new Exception("123");
         }
     }
 
@@ -284,6 +291,90 @@ namespace ConsoleApp1
             }
         }
 
+
+
+
+        public class MyInt { public int MyValue; }
+        public static void Go()
+        {
+            MyInt x = new MyInt();
+            x.MyValue = 2;
+            //DoSomething(x);
+            DoSomethingRef(ref x);
+
+            Console.WriteLine(x.MyValue.ToString());
+        }
+        public static void DoSomething(MyInt pValue)
+        {
+            pValue = new MyInt();
+        }
+        public static void DoSomethingRef(ref MyInt pValue)
+        {
+            pValue = new MyInt();
+        }
+
+
+
+        public static void thread20000()
+        {
+            Thread.Sleep(2000);
+            Console.WriteLine($"{GC.GetTotalMemory(false):N0}");
+            for (var i = 0; i <= 10000; i++)
+            {
+                Thread thread = new Thread(Test, 200_000);
+                thread.IsBackground = true;
+
+                thread.Start();
+            }
+            Console.WriteLine($"{GC.GetTotalMemory(false):N0}");
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+            Console.WriteLine($"{GC.GetTotalMemory(false):N0}");
+        }
+
+        public static void Test()
+        {
+            Thread.Sleep(20000);
+        }
+
+
+        //static void qweExc(object sender, /*UnhandledExceptionEventArgs */ EventArgs e)
+        //{
+        //    Console.WriteLine("меня хотят убить");
+        //    //Thread.ResetAbort();
+        //}
+
+        //[DllImport("kernel32.dll", SetLastError = true)]
+        //internal static extern bool WriteConsoleOutputCharacter(
+        // IntPtr hConsoleOutput,
+        // StringBuilder lpCharacter,
+        // uint nLength,
+        // COORD dwWriteCoord,
+        // out uint lpNumberOfCharsWritten);
+        [DllImport("user32.dll")]
+        private static extern int MessageBox(IntPtr hWnd, String text, String caption, uint type);
+
+
+        static Action Foo()
+        {
+            var actions = new List<Action>();
+            for (int i = 0; i < 10; i++)
+                actions.Add(() => Console.WriteLine(i));
+
+            foreach (var i in Enumerable.Range(11, 15))
+                actions.Add(() => Console.WriteLine(i));
+
+            var q = 4;
+            actions.Add(() => Console.WriteLine(q));
+            q = 44;
+
+            foreach (var a in actions)
+                a();
+            return actions.Last();
+        }
+
+
         static void Main(string[] args)
         {
             //testAbortThread
@@ -307,26 +398,89 @@ namespace ConsoleApp1
             //Array_weight.test5();
             //Array_weight.test6();
 
-            var q1 = new Number();
-            _ = q1.Equals(1);
 
-            try
-            {
-                for (int i = 0; i < 1000_000; i++)
-                    new finClass();
-            }
-            catch
-            {
-                Console.WriteLine("catch");
-            }
-            Thread.Sleep(100000);
+            //var q1 = new Number();
+            //_ = q1.Equals(1);
+
+
+            //Go(); return;
+
+
+            //{
+            //    ThreadPool.GetMaxThreads(out var t, out var io);
+            //    Console.WriteLine($"ThreadPool.GetMaxThreads {t} {io}");
+            //}
+            //{
+            //    ThreadPool.GetMinThreads(out var t, out var io);
+            //    Console.WriteLine($"ThreadPool.GetMinThreads {t} {io}");
+            //}
+            //{
+            //    ThreadPool.GetAvailableThreads(out var t, out var io);
+            //    Console.WriteLine($"ThreadPool.GetAvailableThreads {t} {io}");
+            //}
+            //ThreadPool.SetMinThreads(0, 0);
+            //ThreadPool.SetMaxThreads(0, 0);
+            //{
+            //    ThreadPool.GetMinThreads(out var t, out var io);
+            //    Console.WriteLine($"ThreadPool.GetMinThreads {t} {io}");
+            //}
+            //{
+            //    ThreadPool.GetMaxThreads(out var t, out var io);
+            //    Console.WriteLine($"ThreadPool.GetMaxThreads {t} {io}");
+            //}
+            //{
+            //    ThreadPool.GetAvailableThreads(out var t, out var io);
+            //    Console.WriteLine($"ThreadPool.GetAvailableThreads {t} {io}");
+            //}
+
+
+            //{
+            //    Console.WriteLine($"{GC.GetTotalMemory(false):N0}");
+            //    Thread.Sleep(1000);
+            //    var list = new List<object>();
+            //    int i = 0;
+            //    try
+            //    {
+            //        for (; i < 1_00; i++) list.Add(new finClass());
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Console.WriteLine($"{GC.GetTotalMemory(false):N0}");
+            //        Console.WriteLine("catch");
+            //        Console.WriteLine(ex);
+            //        list.RemoveAt(1);
+            //    }
+            //    Console.WriteLine("i=" + i);
+            //}
+
+
+            //thread20000();
+
+
+            //while(true) 
+            //if (Process.GetCurrentProcess().PriorityClass != ProcessPriorityClass.Idle)
+            //{
+            //    Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
+            //    var psi = new ProcessStartInfo() { FileName = Assembly.GetExecutingAssembly().Location, CreateNoWindow = true, UseShellExecute = false };
+            //    for (int i = 0; i < 50; i++)
+            //        Process.Start(psi);
+            //}
+
+
+            //while (true) { Marshal.AllocHGlobal(1024); }
+
+
+            //MessageBox(new IntPtr(0), "Hello, world!", "My box", 0);
+
+
+            var qq = Foo();
+            //qq();
+
+            var f = new int[1].SingleOrDefault();
+            Console.WriteLine(f);
+
+            Thread.Sleep(100_000);
         }
 
-
-        //static void qweExc(object sender, /*UnhandledExceptionEventArgs */ EventArgs e)
-        //{
-        //    Console.WriteLine("меня хотят убить");
-        //    //Thread.ResetAbort();
-        //}
     }
 }

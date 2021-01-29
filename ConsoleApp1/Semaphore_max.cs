@@ -15,6 +15,11 @@ namespace ConsoleApp1
 {
     static class TryCatch
     {
+        static TryCatch()
+        {
+            Console.WriteLine("static TryCatch");
+        }
+
         static public bool Wrap(Action action)
         {
             try
