@@ -375,8 +375,41 @@ namespace ConsoleApp1
         }
 
 
+        delegate void CustomDel(string s);
+        static void Hello(string s)
+        {
+            Thread.Sleep(100);
+            Console.WriteLine($"  Hello, {s}!");
+        }
+        static void Goodbye(string s)
+        {
+            Thread.Sleep(100);
+            Console.WriteLine($"  Goodbye, {s}!");
+        }
+
+
+
         static void Main(string[] args)
         {
+            //{
+            //    var multiDel = (CustomDel)Hello + Goodbye + Goodbye + Goodbye + Goodbye + Goodbye + Goodbye;
+            //    multiDel("()");
+            //    multiDel.Invoke("Invoke");
+            //    //multiDel.DynamicInvoke(1); //err
+            //    multiDel.DynamicInvoke("DynamicInvoke");
+
+            //    Parallel.ForEach(multiDel.GetInvocationList(),_=> { _.DynamicInvoke("parallel DynamicInvoke"); });//real parallel
+            //    Console.WriteLine("multiDel DONE");
+            //}
+
+
+            //{
+            //    var multiDel = (CustomDel)Hello;
+            //    var iasres=multiDel.BeginInvoke("123", (e) => { Console.WriteLine("state= " + e.AsyncState); }, "something");
+            //    multiDel.EndInvoke(iasres);
+            //    Console.WriteLine("multiDel DONE");
+            //}
+
             //testAbortThread
             //testforeground();
             //testMethodAndOperation();
@@ -473,11 +506,13 @@ namespace ConsoleApp1
             //MessageBox(new IntPtr(0), "Hello, world!", "My box", 0);
 
 
-            var qq = Foo();
+            //var qq = Foo();
             //qq();
+
 
             var f = new int[1].SingleOrDefault();
             Console.WriteLine(f);
+
 
             Thread.Sleep(100_000);
         }
