@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace netCoreApp
 {
@@ -11,7 +12,13 @@ namespace netCoreApp
         {
             Console.WriteLine("Hello World!");
 
-            locks();
+            //IEnumerable<String> strings = new List<String>();
+            //IEnumerable<Object> objects = strings;
+            //var f = (List<int>)objects; // ERR 
+
+            MainAync().GetAwaiter().GetResult();
+
+            //locks();
 
             //span();
 
@@ -147,6 +154,36 @@ namespace netCoreApp
             //Thread.Sleep(10);
             q.Dequeue();
         }
+
+        public static async Task MainAync()
+        {
+            CancellationTokenSource cts = new CancellationTokenSource();
+            var doing = DoAync(cts.Token);
+            //cts.Cancel();
+            await doing;
+        }
+
+        public static async Task DoAync(CancellationToken ct)
+        {
+            await Task.Delay(100);
+             await Task.Run(() => throw new Exception(""), ct)
+                .ContinueWith(_ =>
+                {
+                    Task.Delay(100).Wait();
+                    Console.WriteLine(_.Exception.Message);
+                    return _;
+                }, ct, TaskContinuationOptions.OnlyOnFaulted, TaskScheduler.Current)
+                .ContinueWith(_ =>
+                {
+                    Task.Delay(100).Wait();
+                    Console.WriteLine(_.Exception.Message);
+                    return _;
+                }, ct)
+                .Unwrap()
+                .Unwrap()
+                ;
+        }
+
     }
     internal sealed class SynchronizedQueue<T>
     {
@@ -199,5 +236,10 @@ namespace netCoreApp
             }
             return obj;
         }
+    }
+
+    public interface IQwe<out T>
+    {
+
     }
 }
