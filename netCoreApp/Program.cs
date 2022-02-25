@@ -16,7 +16,9 @@ namespace netCoreApp
             //IEnumerable<Object> objects = strings;
             //var f = (List<int>)objects; // ERR 
 
-            MainAync().GetAwaiter().GetResult();
+            ProtoTest.qwe().GetAwaiter().GetResult();
+
+            //MainAync().GetAwaiter().GetResult();
 
             //locks();
 
