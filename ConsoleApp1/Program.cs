@@ -152,7 +152,9 @@ namespace ConsoleApp1
         }
         class test6DerivedWithNew : test6Class
         {
-            public override int a { get; set; } = 3;
+            public override int a => 3;
+            public int ff() => 33;
+
             //int f()
             //{
             //    return ++base.a;
@@ -163,6 +165,7 @@ namespace ConsoleApp1
             public virtual int a { get; set; }
             public virtual int b { get; set; }
             public void ChangeA() => a++;
+            public virtual int ff() => 3;
         }
         static void test6()
         {
@@ -391,16 +394,20 @@ namespace ConsoleApp1
 
         static void Main(string[] args)
         {
-            //{
-            //    var multiDel = (CustomDel)Hello + Goodbye + Goodbye + Goodbye + Goodbye + Goodbye + Goodbye;
-            //    multiDel("()");
-            //    multiDel.Invoke("Invoke");
-            //    //multiDel.DynamicInvoke(1); //err
-            //    multiDel.DynamicInvoke("DynamicInvoke");
+            var qqq =new test6DerivedWithNew();
+            var aaa = (test6Class)qqq;
+            var rt=aaa.ff();
+            rt=qqq.ff();
+            {
+                var multiDel = (CustomDel)Hello + Goodbye + Goodbye + Goodbye + Goodbye + Goodbye + Goodbye;
+                multiDel("()");
+                multiDel.Invoke("Invoke");
+                //multiDel.DynamicInvoke(1); //err
+                multiDel.DynamicInvoke("DynamicInvoke");
 
-            //    Parallel.ForEach(multiDel.GetInvocationList(),_=> { _.DynamicInvoke("parallel DynamicInvoke"); });//real parallel
-            //    Console.WriteLine("multiDel DONE");
-            //}
+                Parallel.ForEach(multiDel.GetInvocationList(), _ => { _.DynamicInvoke("parallel DynamicInvoke"); });//real parallel
+                Console.WriteLine("multiDel DONE");
+            }
 
 
             //{

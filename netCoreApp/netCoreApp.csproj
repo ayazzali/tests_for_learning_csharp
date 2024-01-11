@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +17,15 @@
 	
 	<ItemGroup>
 		<Protobuf Include="Protos\greet.proto" GrpcServices="Client" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <None Update="acp_test_sign.pfx">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Eight CM.PFX">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 	
 </Project>

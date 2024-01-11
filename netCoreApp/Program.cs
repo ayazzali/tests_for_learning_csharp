@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Org.BouncyCastle.Pkcs;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,6 +13,9 @@ namespace netCoreApp
     {
         static void Main(string[] args)
         {
+            PFX_SN();
+            var f=GetSignCertificate("Eight CM.PFX", "Safety01");
+
             Console.WriteLine("Hello World!");
 
             //IEnumerable<String> strings = new List<String>();
@@ -168,22 +174,76 @@ namespace netCoreApp
         public static async Task DoAync(CancellationToken ct)
         {
             await Task.Delay(100);
-             await Task.Run(() => throw new Exception(""), ct)
-                .ContinueWith(_ =>
+            await Task.Run(() => throw new Exception(""), ct)
+               .ContinueWith(_ =>
+               {
+                   Task.Delay(100).Wait();
+                   Console.WriteLine(_.Exception.Message);
+                   return _;
+               }, ct, TaskContinuationOptions.OnlyOnFaulted, TaskScheduler.Current)
+               .ContinueWith(_ =>
+               {
+                   Task.Delay(100).Wait();
+                   Console.WriteLine(_.Exception.Message);
+                   return _;
+               }, ct)
+               .Unwrap()
+               .Unwrap()
+               ;
+        }
+
+        public static void PFX_SN()
+        {
+            var cert = new X509Certificate2("acp_test_sign.pfx", "000000");
+            Console.WriteLine("SerialNumber: " + cert.SerialNumber);
+
+            //var cert = new X509Certificate("acp_test_sign.pfx", "000000");
+            //Console.WriteLine("SerialNumber: " + cert.GetSerialNumberString());
+        }
+
+        public static object GetSignCertificate(string certificate, string certPwd)
+        {
+            FileStream fs = null;
+            try
+            {
+                fs = new FileStream(certificate, FileMode.Open, FileAccess.Read);
+                var store = new Pkcs12Store(fs, certPwd.ToCharArray());
+
+                var alias = string.Empty;
+                foreach (string n in store.Aliases)
                 {
-                    Task.Delay(100).Wait();
-                    Console.WriteLine(_.Exception.Message);
-                    return _;
-                }, ct, TaskContinuationOptions.OnlyOnFaulted, TaskScheduler.Current)
-                .ContinueWith(_ =>
+                    if (store.IsKeyEntry(n))
+                    {
+                        alias = n;
+                    }
+                }
+
+                var chain = store.GetCertificateChain(alias);
+                var cert = chain[0].Certificate;
+                return new
                 {
-                    Task.Delay(100).Wait();
-                    Console.WriteLine(_.Exception.Message);
-                    return _;
-                }, ct)
-                .Unwrap()
-                .Unwrap()
-                ;
+                    key = store.GetKey(alias).Key,
+                    cert = cert,
+                    certId = cert.SerialNumber.ToString(),
+                };
+                //return new UnionPayCertificate
+                //{
+                //    key = store.GetKey(alias).Key,
+                //    cert = cert,
+                //    certId = cert.SerialNumber.ToString()
+                //};
+
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            finally
+            {
+                if (fs != null)
+                    fs.Close();
+            }
+            return null;
         }
 
     }
@@ -244,4 +304,5 @@ namespace netCoreApp
     {
 
     }
+
 }
